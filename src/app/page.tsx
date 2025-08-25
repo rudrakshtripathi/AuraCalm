@@ -244,8 +244,9 @@ export default function AuraCalmPage() {
         </CardFooter>
       </Card>
       <footer className="text-center mt-8 text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} AuraCalm. AI for a calmer you.</p>
-        <p>For demonstration purposes. Please use Chrome for best results.</p>
+        <p>&copy; {new Date().getFullYear()} AuraCalm </p>
+        <p>AI for a calmer you</p>
+        <p>Designed by Rudraksh Tripathi</p>
       </footer>
     </div>
   );

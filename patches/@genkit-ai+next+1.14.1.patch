@@ -1,0 +1,16 @@
+diff --git a/node_modules/@genkit-ai/next/lib/plugin.js b/node_modules/@genkit-ai/next/lib/plugin.js
+index c800a40d51065790b0e50523f66c9ff35b5a7949..c8044715f57a077227d825c9b2e0436d93616a1b 100644
+--- a/node_modules/@genkit-ai/next/lib/plugin.js
++++ b/node_modules/@genkit-ai/next/lib/plugin.js
+@@ -107,7 +107,9 @@ function GenkitLayout({ children, }) {
+     const [error, setError] = (0, react_1.useState)();
+     const [auth, setAuth] = (0, react_1.useState)();
+     const [loaded, setLoaded] = (0, react_1.useState)(false);
+-    const { flowId } = (0, navigation_1.useParams)();
++    // XXX: Avoid destructuring so Next doesn't complain.
++    const params = (0, navigation_1.useParams)();
++    const flowId = params ? params.flowId : undefined;
+     (0, react_1.useEffect)(() => {
+         const fn = async () => {
+             try {
+
