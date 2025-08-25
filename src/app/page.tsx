@@ -29,7 +29,6 @@ export default function AuraCalmPage() {
   const { toast } = useToast();
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
   const isMonitoringRef = useRef(isMonitoring);
 
   useEffect(() => {
@@ -89,22 +88,14 @@ export default function AuraCalmPage() {
       }
     };
 
-    // This assumes a 'calming-sound.mp3' file exists in the /public folder
-    const audio = new Audio('/calming-sound.mp3');
-    audio.preload = 'auto';
-    audioRef.current = audio;
-
     return () => {
       recognitionRef.current?.stop();
-      audioRef.current?.pause();
     };
   }, [addEvent, toast]);
 
   const triggerIntervention = useCallback(() => {
     addEvent("High stress detected. Triggering calming intervention.");
     setIsStressedState(true);
-
-    audioRef.current?.play().catch(e => console.error("Audio play failed:", e));
 
     if (navigator.vibrate) {
       navigator.vibrate([500, 200, 500]);
@@ -156,7 +147,6 @@ export default function AuraCalmPage() {
     if (isMonitoring) {
       setIsMonitoring(false);
       recognitionRef.current?.stop();
-      audioRef.current?.pause();
       addEvent("Monitoring stopped.");
     } else {
       navigator.mediaDevices.getUserMedia({ audio: true })
