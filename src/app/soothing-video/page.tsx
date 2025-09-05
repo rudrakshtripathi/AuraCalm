@@ -4,7 +4,7 @@ import {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {findYoutubeVideo} from '@/ai/flows/find-youtube-video';
+import {findYoutubeVideo, availableVideos} from '@/ai/flows/find-youtube-video';
 import {Loader, Wand2} from 'lucide-react';
 import {ArrowLeft} from 'lucide-react';
 import Link from 'next/link';
@@ -36,10 +36,12 @@ export default function SoothingVideoPage() {
     setVideoUrl('');
     try {
       const result = await findYoutubeVideo(prompt);
-      if (result.videoId) {
-        setVideoUrl(`https://www.youtube.com/embed/${result.videoId}?autoplay=1`);
+      const selectedVideo = availableVideos.find(v => v.description === result.videoDescription);
+
+      if (selectedVideo) {
+        setVideoUrl(`https://www.youtube.com/embed/${selectedVideo.id}?autoplay=1`);
       } else {
-        setError('Failed to find a video. Please try again.');
+        setError('Failed to find a matching video. Please try a different description.');
       }
     } catch (e: any) {
       setError('Error: ' + e.message);

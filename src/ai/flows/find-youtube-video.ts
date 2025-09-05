@@ -10,16 +10,7 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const FindYoutubeVideoOutputSchema = z.object({
-  videoId: z.string().describe('The YouTube video ID from the provided list.'),
-});
-export type FindYoutubeVideoOutput = z.infer<typeof FindYoutubeVideoOutputSchema>;
-
-export async function findYoutubeVideo(promptText: string): Promise<FindYoutubeVideoOutput> {
-  return findYoutubeVideoFlow(promptText);
-}
-
-const availableVideos = [
+export const availableVideos = [
   { id: 'L_LUpnjgPso', description: 'Peaceful beach with gentle waves and sunset' },
   { id: 'q76bMs-mupI', description: 'Serene forest with sunlight filtering through trees' },
   { id: '2G8LAiHSCAs', description: 'Calm mountain lake with sky reflection' },
@@ -29,7 +20,16 @@ const availableVideos = [
   { id: 'qYg1iRBWj3I', description: 'Beautiful lavender fields in Provence, France' }
 ];
 
-const videoListForPrompt = availableVideos.map(v => `- Video ID: ${v.id}, Description: ${v.description}`).join('\n');
+const FindYoutubeVideoOutputSchema = z.object({
+  videoDescription: z.string().describe(`The full description of the most relevant video from the list. Must be one of: ${availableVideos.map(v => `"${v.description}"`).join(', ')}`),
+});
+export type FindYoutubeVideoOutput = z.infer<typeof FindYoutubeVideoOutputSchema>;
+
+export async function findYoutubeVideo(promptText: string): Promise<FindYoutubeVideoOutput> {
+  return findYoutubeVideoFlow(promptText);
+}
+
+const videoListForPrompt = availableVideos.map(v => `- Description: ${v.description}`).join('\n');
 
 const prompt = ai.definePrompt({
   name: 'findYoutubeVideoPrompt',
@@ -44,7 +44,7 @@ ${videoListForPrompt}
 
 User Request: "{{{input}}}"
 
-Based on the user's request, which video is the most accurate match? Respond with only the videoId for your choice.`,
+Based on the user's request, which video is the most accurate match? Respond with only the full description for your choice in the videoDescription field.`,
 });
 
 const findYoutubeVideoFlow = ai.defineFlow(
