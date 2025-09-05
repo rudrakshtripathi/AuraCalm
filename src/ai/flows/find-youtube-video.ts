@@ -29,18 +29,22 @@ const availableVideos = [
   { id: 'qYg1iRBWj3I', description: 'Beautiful lavender fields in Provence, France' }
 ];
 
-const videoListForPrompt = availableVideos.map(v => `- ${v.id}: ${v.description}`).join('\n');
+const videoListForPrompt = availableVideos.map(v => `- Video ID: ${v.id}, Description: ${v.description}`).join('\n');
 
 const prompt = ai.definePrompt({
   name: 'findYoutubeVideoPrompt',
   input: {schema: z.string()},
   output: {schema: FindYoutubeVideoOutputSchema},
-  prompt: `From the following list of available YouTube videos, choose the ONE video that best matches the user's request. Respond with only the videoId of your choice.
+  prompt: `You are an expert at selecting the perfect calming video. Your task is to analyze the user's request and choose the single best video from the list below that matches their desired scene.
+
+Consider keywords, themes, and the overall mood of the request.
 
 Available Videos:
 ${videoListForPrompt}
 
-User Request: {{{input}}}`,
+User Request: "{{{input}}}"
+
+Based on the user's request, which video is the most accurate match? Respond with only the videoId for your choice.`,
 });
 
 const findYoutubeVideoFlow = ai.defineFlow(
