@@ -10,12 +10,13 @@ import {ArrowLeft} from 'lucide-react';
 import Link from 'next/link';
 
 const examplePrompts = [
-  'A calm beach at sunset',
-  'A peaceful forest with gentle sunlight',
-  'A serene mountain lake reflecting the sky',
-  'Rain falling on a window pane',
-  'A field of lavender swaying in the breeze',
-  'A crackling fireplace in a cozy room',
+  'Peaceful beach with gentle waves and sunset',
+  'Serene forest with sunlight filtering through trees',
+  'Calm mountain lake with sky reflection',
+  'Cozy fireplace with crackling sounds',
+  'Lush green nature scenes with relaxing music',
+  'Gentle rain sounds for sleeping',
+  'Beautiful lavender fields in Provence, France'
 ];
 
 
