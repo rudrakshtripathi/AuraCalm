@@ -23,7 +23,7 @@ const prompt = ai.definePrompt({
   name: 'findYoutubeVideoPrompt',
   input: {schema: z.string()},
   output: {schema: FindYoutubeVideoOutputSchema},
-  prompt: `Find a YouTube video ID for a video that matches the following description. The video should be calming and suitable for stress relief. Only return the videoId. Description: {{{input}}}`,
+  prompt: `Find a valid and embeddable YouTube video ID for a video that matches the following description. The video should be calming and suitable for stress relief. Only return the videoId, and nothing else. Ensure the video is not a YouTube Short or from a playlist. Description: {{{input}}}`,
 });
 
 const findYoutubeVideoFlow = ai.defineFlow(
