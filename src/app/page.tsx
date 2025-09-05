@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { HeartPulse, Loader, Mic, Square } from "lucide-react";
 import { analyzeVocalTone } from "@/ai/flows/analyze-vocal-tone-gemini";
 import { generateCalmingInsight } from "@/ai/flows/generate-calming-insight";
+import { generateStressManagementGuidelines } from "@/ai/flows/generate-stress-management-guidelines";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,11 +26,14 @@ export default function AuraCalmPage() {
   const [feedback, setFeedback] = useState("");
   const [events, setEvents] = useState<string[]>([]);
   const [isStressedState, setIsStressedState] = useState(false);
+  const [lastTranscript, setLastTranscript] = useState("");
+  const [guidelines, setGuidelines] = useState<string[]>([]);
   
   const { toast } = useToast();
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const isMonitoringRef = useRef(isMonitoring);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     isMonitoringRef.current = isMonitoring;
@@ -66,7 +70,7 @@ export default function AuraCalmPage() {
       const transcript = event.results[event.results.length - 1][0].transcript.trim();
       if (transcript) {
         addEvent(`Heard: "${transcript}"`);
-        processTranscription(transcript);
+        setLastTranscript(transcript);
       }
     };
 
@@ -93,16 +97,49 @@ export default function AuraCalmPage() {
     };
   }, [addEvent, toast]);
 
-  const triggerIntervention = useCallback(() => {
+  const triggerIntervention = useCallback(async (text: string, score: number) => {
     addEvent("High stress detected. Triggering calming intervention.");
     setIsStressedState(true);
 
     if (navigator.vibrate) {
       navigator.vibrate([500, 200, 500]);
     }
+    
+    addEvent("Generating personalized insight...");
+    try {
+      const insightResult = await generateCalmingInsight({
+        transcribedText: text,
+        stressScore: score,
+      });
+      setFeedback(insightResult.calmingInsight);
+      addEvent("Insight received.");
+    } catch (insightError) {
+      console.error("Calming Insight Error:", insightError);
+      addEvent("Could not generate personalized insight.");
+    }
+
+    addEvent("Generating stress management guidelines...");
+    try {
+      const guidelinesResult = await generateStressManagementGuidelines({ stressScore: score });
+      setGuidelines(guidelinesResult.guidelines);
+      addEvent("Guidelines received.");
+    } catch (guidelinesError) {
+      console.error("Guidelines Error:", guidelinesError);
+      addEvent("Could not generate guidelines.");
+    }
+    
+    if (audioRef.current) {
+      audioRef.current.play();
+      addEvent("Playing calming music.");
+    }
+
   }, [addEvent]);
 
   const processTranscription = async (text: string) => {
+    if (!text) {
+        addEvent("No speech detected to analyze.");
+        return;
+    };
     setIsProcessing(true);
     addEvent("Analyzing tone...");
     
@@ -111,21 +148,15 @@ export default function AuraCalmPage() {
       addEvent("Analysis complete.");
       setStressLevel(result.stressScore);
       setFeedback(result.feedback);
+      setGuidelines([]);
+      
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
 
       if (result.stressScore > 70) {
-        triggerIntervention();
-        addEvent("Generating personalized insight...");
-        try {
-          const insightResult = await generateCalmingInsight({
-            transcribedText: text,
-            stressScore: result.stressScore,
-          });
-          setFeedback(insightResult.calmingInsight);
-          addEvent("Insight received.");
-        } catch (insightError) {
-          console.error("Calming Insight Error:", insightError);
-          addEvent("Could not generate personalized insight.");
-        }
+        await triggerIntervention(text, result.stressScore);
       } else {
         setIsStressedState(false);
       }
@@ -148,6 +179,7 @@ export default function AuraCalmPage() {
       setIsMonitoring(false);
       recognitionRef.current?.stop();
       addEvent("Monitoring stopped.");
+      processTranscription(lastTranscript);
     } else {
       navigator.mediaDevices.getUserMedia({ audio: true })
         .then(() => {
@@ -156,6 +188,12 @@ export default function AuraCalmPage() {
           setFeedback("");
           setEvents([]);
           setIsStressedState(false);
+          setLastTranscript("");
+          setGuidelines([]);
+          if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current.currentTime = 0;
+          }
           addEvent("Monitoring started. Please speak.");
           recognitionRef.current?.start();
         })
@@ -197,13 +235,22 @@ export default function AuraCalmPage() {
               </span>
              </div>
           </div>
-
+          
           <div className="text-center h-16 w-full max-w-lg">
             <p className="font-semibold text-lg text-foreground">AI Insight</p>
             <p className="text-muted-foreground min-h-[2.5rem] transition-opacity duration-300 px-4">
               {isProcessing && !feedback ? <span className="italic">Analyzing...</span> : feedback || "Waiting for input..."}
             </p>
           </div>
+          
+          {guidelines.length > 0 && (
+            <div className="w-full max-w-lg text-center">
+              <h3 className="font-semibold text-lg text-foreground mb-2">Stress Management Guidelines</h3>
+              <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                {guidelines.map((guideline, index) => <li key={index}>{guideline}</li>)}
+              </ul>
+            </div>
+          )}
 
           <Button
             onClick={handleStartStop}
@@ -229,6 +276,8 @@ export default function AuraCalmPage() {
               </>
             )}
           </Button>
+
+          <audio ref={audioRef} src="/soothing-music.mp3" loop />
         </CardContent>
         <CardFooter className="bg-muted/30 p-4 border-t">
           <div className="w-full">
