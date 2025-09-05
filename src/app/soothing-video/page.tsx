@@ -4,11 +4,10 @@ import {useState} from 'react';
 import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {generateSoothingVideo} from '@/ai/flows/generate-soothing-video';
+import {findYoutubeVideo} from '@/ai/flows/find-youtube-video';
 import {Loader, Wand2} from 'lucide-react';
 import {ArrowLeft} from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 const examplePrompts = [
   'A calm beach at sunset',
@@ -28,18 +27,18 @@ export default function SoothingVideoPage() {
 
   const handleGenerate = async () => {
     if (!prompt) {
-      setError('Please enter a prompt to generate a video.');
+      setError('Please enter a prompt to find a video.');
       return;
     }
     setLoading(true);
     setError('');
     setVideoUrl('');
     try {
-      const result = await generateSoothingVideo(prompt);
-      if (result.videoUrl) {
-        setVideoUrl(result.videoUrl);
+      const result = await findYoutubeVideo(prompt);
+      if (result.videoId) {
+        setVideoUrl(`https://www.youtube.com/embed/${result.videoId}?autoplay=1`);
       } else {
-        setError('Failed to generate video. Please try again.');
+        setError('Failed to find a video. Please try again.');
       }
     } catch (e: any) {
       setError('Error: ' + e.message);
@@ -60,9 +59,9 @@ export default function SoothingVideoPage() {
           </Button>
         </Link>
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">Generate a Soothing Scene</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">Find a Soothing Scene</CardTitle>
           <CardDescription className="text-lg">
-            Describe a calming scene and let AI create an image for you.
+            Describe a calming scene and let AI find a YouTube video for you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -85,12 +84,19 @@ export default function SoothingVideoPage() {
             </div>
             <Button onClick={handleGenerate} disabled={loading} size="lg">
               {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Generating...' : 'Generate Scene'}
+              {loading ? 'Finding...' : 'Find Scene'}
             </Button>
             {error && <p className="text-red-500 text-center">{error}</p>}
             {videoUrl && (
-              <div className="mt-4 rounded-lg overflow-hidden shadow-lg">
-                <Image src={videoUrl} alt={prompt} width={600} height={400} className="w-full" />
+              <div className="mt-4 rounded-lg overflow-hidden shadow-lg aspect-video">
+                <iframe 
+                  src={videoUrl} 
+                  title="Soothing Video"
+                  className="w-full h-full"
+                  frameBorder="0" 
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                  allowFullScreen>
+                </iframe>
               </div>
             )}
           </div>
