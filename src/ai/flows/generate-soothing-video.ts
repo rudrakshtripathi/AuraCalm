@@ -12,11 +12,8 @@ import type {GenerateSoothingVideoOutput} from '@/ai/schemas/video';
 
 export async function generateSoothingVideo(promptText: string): Promise<GenerateSoothingVideoOutput> {
   const {media} = await ai.generate({
-    model: googleAI.model('gemini-2.5-flash-image-preview'),
-    prompt: `Generate a short, looping, soothing video based on this description: ${promptText}`,
-    config: {
-      responseModalities: ['IMAGE'], 
-    },
+    model: googleAI.model('gemini-2.5-flash'),
+    prompt: `Generate an image that represents a short, looping, soothing video based on this description: ${promptText}. The image should be serene and calming.`,
   });
 
   if (!media || !media.url) {

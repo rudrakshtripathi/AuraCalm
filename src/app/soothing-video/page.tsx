@@ -8,6 +8,7 @@ import {generateSoothingVideo} from '@/ai/flows/generate-soothing-video';
 import {Loader, Wand2} from 'lucide-react';
 import {ArrowLeft} from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const examplePrompts = [
   'A calm beach at sunset',
@@ -59,9 +60,9 @@ export default function SoothingVideoPage() {
           </Button>
         </Link>
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold tracking-tight">Generate a Soothing Video</CardTitle>
+          <CardTitle className="text-3xl font-bold tracking-tight">Generate a Soothing Scene</CardTitle>
           <CardDescription className="text-lg">
-            Describe a calming scene and let AI create a video for you.
+            Describe a calming scene and let AI create an image for you.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -84,12 +85,12 @@ export default function SoothingVideoPage() {
             </div>
             <Button onClick={handleGenerate} disabled={loading} size="lg">
               {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-              {loading ? 'Generating...' : 'Generate Video'}
+              {loading ? 'Generating...' : 'Generate Scene'}
             </Button>
             {error && <p className="text-red-500 text-center">{error}</p>}
             {videoUrl && (
               <div className="mt-4 rounded-lg overflow-hidden shadow-lg">
-                <video controls src={videoUrl} className="w-full " />
+                <Image src={videoUrl} alt={prompt} width={600} height={400} className="w-full" />
               </div>
             )}
           </div>
