@@ -4,17 +4,11 @@
  * @fileOverview A soothing video generation AI agent.
  *
  * - generateSoothingVideo - A function that handles the video generation process.
- * - GenerateSoothingVideoOutput - The return type for the generateSoothingVideo function.
  */
 
 import {ai} from '@/ai/genkit';
 import {googleAI} from '@genkit-ai/googleai';
-import {z} from 'genkit';
-
-export const GenerateSoothingVideoOutputSchema = z.object({
-  videoUrl: z.string().describe('The data URI of the generated video.'),
-});
-export type GenerateSoothingVideoOutput = z.infer<typeof GenerateSoothingVideoOutputSchema>;
+import type {GenerateSoothingVideoOutput} from '@/ai/schemas/video';
 
 export async function generateSoothingVideo(promptText: string): Promise<GenerateSoothingVideoOutput> {
   let {operation} = await ai.generate({

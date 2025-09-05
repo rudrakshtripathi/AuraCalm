@@ -6,6 +6,8 @@ import {Input} from '@/components/ui/input';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {generateSoothingVideo} from '@/ai/flows/generate-soothing-video';
 import {Loader} from 'lucide-react';
+import {ArrowLeft} from 'lucide-react';
+import Link from 'next/link';
 
 export default function SoothingVideoPage() {
   const [prompt, setPrompt] = useState('');
@@ -32,10 +34,15 @@ export default function SoothingVideoPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-      <Card className="w-full max-w-2xl">
-        <CardHeader>
-          <CardTitle>Generate a Soothing Video</CardTitle>
-          <CardDescription>
+      <Card className="w-full max-w-2xl relative">
+        <Link href="/" className="absolute top-4 left-4">
+          <Button variant="ghost" size="icon">
+            <ArrowLeft className="w-6 h-6 text-muted-foreground" />
+          </Button>
+        </Link>
+        <CardHeader className="text-center">
+          <CardTitle className="text-3xl font-bold tracking-tight">Generate a Soothing Video</CardTitle>
+          <CardDescription className="text-lg">
             Enter a prompt to generate a soothing video with AI. For example, "a calm beach at sunset".
           </CardDescription>
         </CardHeader>
