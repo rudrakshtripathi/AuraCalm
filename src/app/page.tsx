@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { HeartPulse, Loader, Mic, Square, Wind } from "lucide-react";
+import { HeartPulse, Loader, Mic, Square, Wind, Clapperboard } from "lucide-react";
 import Link from 'next/link';
 import { analyzeVocalTone } from "@/ai/flows/analyze-vocal-tone-gemini";
 import { generateCalmingInsight } from "@/ai/flows/generate-calming-insight";
@@ -278,12 +278,20 @@ export default function AuraCalmPage() {
             )}
           </Button>
 
-          <Link href="/calm-corner">
-            <Button variant="outline" className="rounded-full">
-                <Wind className="mr-2 h-4 w-4" />
-                Go to Calm Corner
-            </Button>
-          </Link>
+          <div className="flex gap-4">
+            <Link href="/calm-corner">
+              <Button variant="outline" className="rounded-full">
+                  <Wind className="mr-2 h-4 w-4" />
+                  Go to Calm Corner
+              </Button>
+            </Link>
+            <Link href="/soothing-video">
+              <Button variant="outline" className="rounded-full">
+                  <Clapperboard className="mr-2 h-4 w-4" />
+                  Generate Soothing Video
+              </Button>
+            </Link>
+          </div>
 
           <audio ref={audioRef} src="/soothing-music.mp3" loop />
         </CardContent>
