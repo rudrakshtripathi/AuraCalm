@@ -39,7 +39,7 @@ const prompt = ai.definePrompt({
   name: 'analyzeVocalTonePrompt',
   input: {schema: AnalyzeVocalToneInputSchema},
   output: {schema: AnalyzeVocalToneOutputSchema},
-  prompt: `Analyze the following spoken text for signs of psychological stress, anxiety, or urgency. Focus on vocal tone characteristics that would be present in the transcription, like pace, repetition, and word choice. Respond in a strict JSON format: { \"stressScore\": a number between 0 (calm) and 100 (extremely stressed), \"feedback\": a one-sentence string providing the insight } Text to analyze: {{{transcribedText}}}`,
+  prompt: `Analyze the following spoken text for signs of psychological stress, anxiety, or urgency. Focus on vocal tone characteristics that would be present in the transcription, like pace, repetition, and word choice. Respond in a strict JSON format: { "stressScore": a number between 0 (calm) and 100 (extremely stressed), "feedback": a one-sentence string providing the insight } Text to analyze: {{{transcribedText}}}`,
 });
 
 const analyzeVocalToneFlow = ai.defineFlow(
@@ -49,20 +49,7 @@ const analyzeVocalToneFlow = ai.defineFlow(
     outputSchema: AnalyzeVocalToneOutputSchema,
   },
   async input => {
-    try {
-      const {output} = await prompt(input);
-      // Attempt to parse the JSON string into an object.
-      if (typeof output === 'string') {
-        // added this if statement to make sure that it's already parsed json object
-        const parsedOutput = JSON.parse(output);
-        return parsedOutput as AnalyzeVocalToneOutput;
-      }
-      return output!;
-    } catch (error) {
-      console.error('Error parsing Gemini output:', error);
-      // Handle the error gracefully, e.g., return a default value or throw an error.
-      throw new Error("Failed to parse Gemini's response.");
-    }
+    const {output} = await prompt(input);
+    return output!;
   }
 );
-
